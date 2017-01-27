@@ -199,6 +199,8 @@ public class OnboardingActivity extends AppCompatActivity {
                 final String notify = OnboardingFragment2.alarming.getText().toString();
                 final String invitedContacts = OnboardingFragment3.mtxtinvited.getText().toString();
 
+                Toast.makeText(getBaseContext(), startDate + ":" + endDate, Toast.LENGTH_SHORT).show();
+
 
                 if (name.isEmpty()) {
                     Toast.makeText(context, "Invalid Event Name", Toast.LENGTH_SHORT).show();
