@@ -18,7 +18,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
     public static final int database_version = 1;
 
-    public String CREATE_EVENTS = "CREATE TABLE " + DataInfo.TBl_Events + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+    public String CREATE_EVENTS = "CREATE TABLE " + DataInfo.TBl_Events + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, "+DataInfo.EventID+" TEXT, " +
             DataInfo.EventName + " TEXT," + DataInfo.EventDescription + " TEXT," + DataInfo.EventLocation + " TEXT," +
             DataInfo.EventStartDate + " TEXT," + DataInfo.EventStartTime + " TEXT," + DataInfo.EventEndDate + " TEXT," +
             DataInfo.EventEndTime + " TEXT," + DataInfo.Notify + " TEXT," + DataInfo.Extra1 + " TEXT," +
@@ -52,13 +52,13 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
     //region METHODS
 
-    public void saveEvent(String eventname, String eventDescription, String eventLocation,
+    public void saveEvent(Long  eventid,String eventname, String eventDescription, String eventLocation,
                           String eventStartDate, String eventStartTime, String eventEndDate, String eventEndTime, String notify, String invitedfirends) {
 
         SQLiteDatabase sql = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
-
+        cv.put(DataInfo.EventID, eventid);
         cv.put(DataInfo.EventName, eventname);
         cv.put(DataInfo.EventDescription, eventDescription);
         cv.put(DataInfo.EventLocation, eventLocation);

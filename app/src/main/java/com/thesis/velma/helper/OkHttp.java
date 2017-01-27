@@ -65,6 +65,7 @@ public class OkHttp {
             @Override
             public void onFailure(Call call, IOException e) {
             }
+
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 // ... check for failure using `isSuccessful` before proceeding
@@ -103,8 +104,59 @@ public class OkHttp {
                 }
             }
         });
+    }
+
+    public void saveEvent(Long eventid, String eventname, String eventDescription, String eventLocation,
+                          String eventStartDate, String eventStartTime, String eventEndDate,
+                          String eventEndTime, String notify, String invitedfirends) {
+
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://velma.000webhostapp.com/events.php").newBuilder();
+        urlBuilder.addQueryParameter("eventid", "" + eventid);
+        urlBuilder.addQueryParameter("eventname", eventname);
+        urlBuilder.addQueryParameter("eventDescription", eventDescription);
+        urlBuilder.addQueryParameter("eventLocation", eventLocation);
+        urlBuilder.addQueryParameter("eventStartDate", eventStartDate);
+        urlBuilder.addQueryParameter("eventStartTime", eventStartTime);
+        urlBuilder.addQueryParameter("eventEndDate", eventEndDate);
+        urlBuilder.addQueryParameter("eventEndTime", eventEndTime);
+        urlBuilder.addQueryParameter("notify", notify);
+        urlBuilder.addQueryParameter("invitedfirends", invitedfirends);
+
+        String Url = urlBuilder.build().toString();
+
+        Log.d("URL", Url);
+
+        Request request = new Request.Builder()
+                .url(Url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                // ... check for failure using `isSuccessful` before proceeding
+                // Read data on the worker thread
+                final String responseData = response.body().string();
+                Log.d("Data", responseData);
+                if (response.code() == 200) {
+                    // Run view-related code back on the main thread
+
+                } else {
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(mcontext, "Faile to register", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
 
 
     }
+
 
 }

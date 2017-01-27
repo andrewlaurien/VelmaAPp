@@ -20,6 +20,7 @@ public class DBInfo {
 
 
         //FieldName
+        public static final String EventID = "EventID";
         public static final String EventName = "EventName";
         public static final String EventDescription = "EventDescription";
         public static final String EventLocation = "EventLocation";

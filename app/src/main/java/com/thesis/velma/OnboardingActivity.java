@@ -24,6 +24,7 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
+import com.thesis.velma.helper.OkHttp;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -38,13 +39,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.Random;
 
 import static android.content.ContentValues.TAG;
 import static com.thesis.velma.OnboardingFragment2.dateEnd;
 import static com.thesis.velma.OnboardingFragment2.dateStart;
 import static com.thesis.velma.OnboardingFragment2.timeStart;
-import static com.thesis.velma.OnboardingFragment3.invitedContacts;
 
 /**
  * Created by jeanneviegarciano on 8/10/2016.
@@ -185,6 +185,9 @@ public class OnboardingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Random r = new Random();
+                long unixtime = (long) (1293861599 + r.nextDouble() * 60 * 60 * 24 * 365);
+
 
                 final String name = event.getText().toString();
                 final String eventDescription = descrip.getText().toString();
@@ -210,7 +213,11 @@ public class OnboardingActivity extends AppCompatActivity {
                 } else {
 
 
-                    LandingActivity.db.saveEvent(name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify,invitedContacts);
+                    LandingActivity.db.saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
+
+                    OkHttp.getInstance(getBaseContext()).saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
+
+
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     finish();
