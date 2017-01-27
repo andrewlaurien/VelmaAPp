@@ -110,7 +110,7 @@ public class OkHttp {
                           String eventStartDate, String eventStartTime, String eventEndDate,
                           String eventEndTime, String notify, String invitedfirends) {
 
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://velma.000webhostapp.com/events.php").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://velma.000webhostapp.com/add_velma_events.php").newBuilder();
         urlBuilder.addQueryParameter("eventid", "" + eventid);
         urlBuilder.addQueryParameter("eventname", eventname);
         urlBuilder.addQueryParameter("eventDescription", eventDescription);
