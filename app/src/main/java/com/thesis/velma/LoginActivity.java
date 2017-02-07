@@ -49,6 +49,7 @@ import com.google.api.services.people.v1.model.ListConnectionsResponse;
 import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.thesis.velma.helper.DataBaseHandler;
 import com.thesis.velma.helper.OkHttp;
 import com.thesis.velma.helper.PeopleHelper;
@@ -255,69 +256,18 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
             String mFullName = acct.getDisplayName();
             String mEmail = acct.getEmail();
 
-            new PeoplesAsync().execute(acct.getServerAuthCode());
+            String[] topicname = mEmail.split("@");
 
-//            Log.d(TAG, "FullName" + mFullName);
-//            Log.d(TAG, "Email" + mEmail);
+            Log.d("Topic", topicname[0] + "Velma");
+
+            FirebaseMessaging.getInstance().subscribeToTopic(topicname[0] + "Velma");
+            new PeoplesAsync().execute(acct.getServerAuthCode());
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mcontext);
             prefs.edit().putBoolean("isLoggedIn", true).commit();
             prefs.edit().putString("FullName", mFullName).commit();
             prefs.edit().putString("Email", mEmail).commit();
 
             OkHttp.getInstance(mcontext).saveProfile(imei, mEmail, mFullName);
-
-
-//                    JSONApi.getInstance(getContext()).getPurchaseTransact(Constants.purchaseTransact + "IMEI=" + MainActivity.imei
-//                    + "&SourceMobTel=" + MainActivity.number + "&AuthCode=" + auth + "&SessionNo=" + MainActivity.sessionId + "&PartnerID=EASYLOAD" + "&Network=Globe");
-
-
-//            GoogleSignInAccount acct = result.getSignInAccount();
-//            Toast.makeText(getApplicationContext(), "" + acct.getDisplayName(), Toast.LENGTH_LONG).show();
-//
-//            Plus.PeopleApi.load(google_api_client, acct.getId()).setResultCallback(new ResultCallback<People.LoadPeopleResult>() {
-//                @Override
-//                public void onResult(@NonNull People.LoadPeopleResult loadPeopleResult) {
-//                    Person person = loadPeopleResult.getPersonBuffer().get(0);
-//                    Log.d(TAG, "Person loaded");
-//                    Log.d(TAG, "GivenName " + person.getName().getGivenName());
-//                    Log.d(TAG, "FamilyName " + person.getName().getFamilyName());
-//                    Log.d(TAG, ("DisplayName " + person.getDisplayName()));
-//                    Log.d(TAG, "Gender " + person.getGender());
-//                    Log.d(TAG, "Url " + person.getUrl());
-//                    Log.d(TAG, "CurrentLocation " + person.getCurrentLocation());
-//                    Log.d(TAG, "AboutMe " + person.getAboutMe());
-//                    Log.d(TAG, "Birthday " + person.getBirthday());
-//                    Log.d(TAG, "Image " + person.getImage());
-//
-//
-//                    if (ActivityCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
-//                        if (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this,
-//                                Manifest.permission.GET_ACCOUNTS)) {
-//                            String email = Plus.AccountApi.getAccountName(google_api_client);
-//                            Log.d(TAG, "email " + email);
-//                        } else {
-//                            ActivityCompat.requestPermissions(LoginActivity.this,
-//                                    new String[]{android.Manifest.permission.READ_CONTACTS},
-//                                    2);
-//
-//                            Log.d(TAG, "email blank");
-//                        }
-//
-//                        return;
-//                    } else {
-//                        Toast.makeText(getBaseContext(), "Hi", Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//                    prefs.edit().putBoolean("isLoggedIn", true).commit();
-//                    Intent i = new Intent(LoginActivity.this, LandingActivity.class);
-//                    startActivity(i);
-//
-//                }
-//            });
-
-            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            // changeUI(true);
         } else
 
         {
@@ -493,7 +443,6 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                         List<Name> names = person.getNames();
                         List<EmailAddress> emailAddresses = person.getEmailAddresses();
                         List<PhoneNumber> phoneNumbers = person.getPhoneNumbers();
-
 
                         if (phoneNumbers != null)
                             for (PhoneNumber phoneNumber : phoneNumbers)

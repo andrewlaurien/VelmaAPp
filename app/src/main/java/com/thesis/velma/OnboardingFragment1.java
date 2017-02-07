@@ -211,7 +211,7 @@ public class OnboardingFragment1 extends Fragment implements View.OnClickListene
                 String regAPIURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + LandingActivity.origlatitude + "," + LandingActivity.origlongitude;
                 regAPIURL = regAPIURL + "&destinations=" + URLEncoder.encode(coordinates);
                 regAPIURL = regAPIURL + "&mode=" + URLEncoder.encode(modetravel);
-                regAPIURL = regAPIURL + "&key=AIzaSyBe_f0qd5CJ0m6Xo5CwWxiCPeVE-7uxmkU";
+                regAPIURL = regAPIURL + "&key=AIzaSyDWjoAbJf9uDrLCFAM_fCSWxP0muVEGbOA";
                 Log.d("URI", regAPIURL);
                 HttpGet httpGet = new HttpGet(regAPIURL);
                 HttpParams httpParameters = new BasicHttpParams();

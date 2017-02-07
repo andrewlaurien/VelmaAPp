@@ -199,7 +199,14 @@ public class OnboardingActivity extends AppCompatActivity {
                 final String notify = OnboardingFragment2.alarming.getText().toString();
                 final String invitedContacts = OnboardingFragment3.mtxtinvited.getText().toString();
 
-                Toast.makeText(getBaseContext(), startDate + ":" + endDate, Toast.LENGTH_SHORT).show();
+
+                //Toast.makeText(getBaseContext(), startDate + ":" + endDate, Toast.LENGTH_SHORT).show();
+
+
+                Log.d("StarTime", startDate + " " + startTime);
+                Log.d("EndTime", endDate + " " + endTime);
+
+
 
 
                 if (name.isEmpty()) {
@@ -216,9 +223,13 @@ public class OnboardingActivity extends AppCompatActivity {
 
 
                     LandingActivity.db.saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
-
                     OkHttp.getInstance(getBaseContext()).saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
 
+                    for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
+                        OkHttp.getInstance(context).sendNotification(unixtime, name, eventDescription, eventLocation,
+                                startDate, startTime, endDate, endTime, notify, invitedContacts, OnboardingFragment3.invitedContacts.get(i) + "Velma");
+
+                    }
 
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
@@ -260,7 +271,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 String regAPIURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + LandingActivity.origlatitude + "," + LandingActivity.origlongitude;
                 regAPIURL = regAPIURL + "&destinations=" + URLEncoder.encode(coordinates);
                 regAPIURL = regAPIURL + "&mode=" + URLEncoder.encode(modetravel);
-                regAPIURL = regAPIURL + "&key=AIzaSyBe_f0qd5CJ0m6Xo5CwWxiCPeVE-7uxmkU";
+                regAPIURL = regAPIURL + "&key=AIzaSyDWjoAbJf9uDrLCFAM_fCSWxP0muVEGbOA";
                 Log.d("URI", regAPIURL);
                 HttpGet httpGet = new HttpGet(regAPIURL);
                 HttpParams httpParameters = new BasicHttpParams();

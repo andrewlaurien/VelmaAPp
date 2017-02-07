@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -39,6 +41,7 @@ import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.thesis.velma.apiclient.MyEvent;
 import com.thesis.velma.helper.DataBaseHandler;
+import com.thesis.velma.helper.OkHttp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -88,7 +91,10 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
     LocationManager locationManager;
 
     MaterialDialog dialog;
+    String eventID;
 
+
+    public static String profilename;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +108,12 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
         mAgendaCalendarView = (AgendaCalendarView) findViewById(R.id.agenda_calendar_view);
         mcontext = this;
 
+
         db = new DataBaseHandler(mcontext);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mcontext);
+// then you use
+        profilename = prefs.getString("FullName", null);
 
 
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -146,6 +157,21 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
                     },
                     LOCATION_REQUEST);
         }
+        //7-2-20172:20
+        //7-2-20173:15
+//        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmm");
+//        Date sdate = null, edate = null;
+//        try {
+//            sdate = formatter.parse("722017220");
+//            edate = formatter.parse("722017315");
+//        } catch (ParseException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+//
+//        Log.d("StarTime", formatter.format(sdate));
+//        Log.d("EndTime", formatter.format(edate));
 
 
     }
@@ -235,54 +261,61 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
         //  Log.d(LOG_TAG, String.format("Selected event: %s", event));
         //Toast.makeText(getBaseContext(), "" + event.getId(), Toast.LENGTH_SHORT).show();
 
-        String content = "";
-        Cursor c = db.getEventDetails(event.getId());
 
-        while (c.moveToNext()) {
+        if (event.getId() != 0) {
 
-            content = "Descrition: " + c.getString(c.getColumnIndex("EventDescription")) + "\n" +
-                    "Location: " + c.getString(c.getColumnIndex("EventLocation")) + "\n" +
-                    "StartDate: " + c.getString(c.getColumnIndex("StartDate")) + "\n" +
-                    "EndDate: " + c.getString(c.getColumnIndex("EndDate")) + "\n" +
-                    "StartTime: " + c.getString(c.getColumnIndex("StartTime")) + "\n" +
-                    "EndTime: " + c.getString(c.getColumnIndex("EndTime")) + "\n";
+            String content = "";
+            Cursor c = db.getEventDetails(event.getId());
 
+            while (c.moveToNext()) {
+
+                content = "Descrition: " + c.getString(c.getColumnIndex("EventDescription")) + "\n" +
+                        "Location: " + c.getString(c.getColumnIndex("EventLocation")) + "\n" +
+                        "StartDate: " + c.getString(c.getColumnIndex("StartDate")) + "\n" +
+                        "EndDate: " + c.getString(c.getColumnIndex("EndDate")) + "\n" +
+                        "StartTime: " + c.getString(c.getColumnIndex("StartTime")) + "\n" +
+                        "EndTime: " + c.getString(c.getColumnIndex("EndTime")) + "\n";
+
+                eventID = c.getString(c.getColumnIndex("EventID"));
+
+            }
+
+
+            dialog = new MaterialDialog.Builder(this)
+                    .title(event.getTitle())
+                    .content(content)
+                    .positiveText("Ok")
+                    .negativeText("Delete")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            // TODO
+                        }
+                    })
+                    .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            // TODO
+                        }
+                    })
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            // TODO
+                            db.deleteEvent(event.getId());
+                            OkHttp.getInstance(mcontext).deleteEvent(eventID);
+                            dialog.dismiss();
+                            LoadEvents();
+                        }
+                    })
+                    .onAny(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            // TODO
+                        }
+                    })
+                    .show();
         }
-
-
-        dialog = new MaterialDialog.Builder(this)
-                .title(event.getTitle())
-                .content(content)
-                .positiveText("Ok")
-                .negativeText("Delete")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        // TODO
-                    }
-                })
-                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        // TODO
-                    }
-                })
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        // TODO
-                        db.deleteEvent(event.getId());
-                        dialog.dismiss();
-                        LoadEvents();
-                    }
-                })
-                .onAny(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        // TODO
-                    }
-                })
-                .show();
 
 
     }
@@ -309,8 +342,6 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
                 .addScope(Plus.SCOPE_PLUS_PROFILE)
                 .build();
     }
-
-
 
 
     @Override

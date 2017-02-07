@@ -37,9 +37,11 @@
                         android:id="@+id/eventname"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="left"
                         android:hint="@string/addevent"
                         android:inputType="textShortMessage"
                         android:paddingTop="40dp"
+                        android:textColor="#FFFFFF"
                         android:textSize="40sp" />
 
 
