@@ -225,7 +225,7 @@ public class OnboardingActivity extends AppCompatActivity {
 
                     for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
 
-                        String[] target = OnboardingFragment3.invitedContacts.get(i).split("a");
+                        String[] target = OnboardingFragment3.invitedContacts.get(i).split("@");
 
                         OkHttp.getInstance(context).sendNotification(unixtime, name, eventDescription, eventLocation,
                                 startDate, startTime, endDate, endTime, notify, invitedContacts, target[0] + "Velma");
