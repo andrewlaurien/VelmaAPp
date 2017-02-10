@@ -207,8 +207,6 @@ public class OnboardingActivity extends AppCompatActivity {
                 Log.d("EndTime", endDate + " " + endTime);
 
 
-
-
                 if (name.isEmpty()) {
                     Toast.makeText(context, "Invalid Event Name", Toast.LENGTH_SHORT).show();
                 } else if (eventDescription.isEmpty()) {
@@ -226,8 +224,11 @@ public class OnboardingActivity extends AppCompatActivity {
                     OkHttp.getInstance(getBaseContext()).saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
 
                     for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
+
+                        String[] target = OnboardingFragment3.invitedContacts.get(i).split("a");
+
                         OkHttp.getInstance(context).sendNotification(unixtime, name, eventDescription, eventLocation,
-                                startDate, startTime, endDate, endTime, notify, invitedContacts, OnboardingFragment3.invitedContacts.get(i) + "Velma");
+                                startDate, startTime, endDate, endTime, notify, invitedContacts, target[0] + "Velma");
 
                     }
 
