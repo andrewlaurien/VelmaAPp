@@ -25,7 +25,7 @@ import java.util.Calendar;
 /**
  * Created by jeanneviegarciano on 8/10/2016.
  */
-public class OnboardingFragment2 extends Fragment implements View.OnClickListener{
+public class OnboardingFragment2 extends Fragment implements View.OnClickListener {
     View rootView;
     public static int sYear, sMonth, sDay, sHour, sMinute;
     public static int eYear, eMonth, eDay, eHour, eMinute;
@@ -35,6 +35,7 @@ public class OnboardingFragment2 extends Fragment implements View.OnClickListene
     public static TextView timeEnd;
     public static EditText alarming;
     int PLACE_PICKER_REQUEST = 1;
+    DatePickerDialog datePickerDialog;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -43,15 +44,27 @@ public class OnboardingFragment2 extends Fragment implements View.OnClickListene
 
         // Get current date by calender
 
+        datePickerDialog = new DatePickerDialog(getContext(),
+                new DatePickerDialog.OnDateSetListener() {
 
-        dateStart = (TextView)rootView.findViewById(R.id.startdate);
+                    @Override
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth) {
+
+                        dateStart.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+
+                    }
+                }, sYear, sMonth, sDay);
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 10000);
+
+        dateStart = (TextView) rootView.findViewById(R.id.startdate);
         dateStart.setHintTextColor(getResources().getColor(R.color.colorPrimary));
         dateStart.setInputType(InputType.TYPE_NULL);
-        dateEnd = (TextView)rootView.findViewById(R.id.enddate);
+        dateEnd = (TextView) rootView.findViewById(R.id.enddate);
         dateEnd.setHintTextColor(getResources().getColor(R.color.colorPrimary));
-        timeStart = (TextView)rootView.findViewById(R.id.starttime);
+        timeStart = (TextView) rootView.findViewById(R.id.starttime);
         timeStart.setHintTextColor(getResources().getColor(R.color.colorPrimary));
-        timeEnd = (TextView)rootView.findViewById(R.id.endtime);
+        timeEnd = (TextView) rootView.findViewById(R.id.endtime);
         timeEnd.setHintTextColor(getResources().getColor(R.color.colorPrimary));
         alarming = (EditText) rootView.findViewById(R.id.alarm);
         alarming.setHintTextColor(getResources().getColor(R.color.colorPrimary));
@@ -60,7 +73,6 @@ public class OnboardingFragment2 extends Fragment implements View.OnClickListene
         timeStart.setOnClickListener(this);
         timeEnd.setOnClickListener(this);
         alarming.setOnClickListener(this);
-
 
 
         return rootView;
@@ -75,19 +87,6 @@ public class OnboardingFragment2 extends Fragment implements View.OnClickListene
             sMonth = c.get(Calendar.MONTH);
             sDay = c.get(Calendar.DAY_OF_MONTH);
 
-
-            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
-                    new DatePickerDialog.OnDateSetListener() {
-
-                        @Override
-                        public void onDateSet(DatePicker view, int year,
-                                              int monthOfYear, int dayOfMonth) {
-
-                            dateStart.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-
-                        }
-                    }, sYear, sMonth, sDay);
-            datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 10000);
             datePickerDialog.show();
         } else if (view == dateEnd) {
             final Calendar c = Calendar.getInstance();
@@ -149,9 +148,7 @@ public class OnboardingFragment2 extends Fragment implements View.OnClickListene
                         }
                     }, eHour, eMinute, false);
             timePickerDialog.show();
-        }
-
-        else if (view == alarming) {
+        } else if (view == alarming) {
 
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
             alertBuilder.setIcon(R.drawable.alarm);
@@ -213,8 +210,6 @@ public class OnboardingFragment2 extends Fragment implements View.OnClickListene
 
             alertDialog.show();
         }
-
-
 
 
     }

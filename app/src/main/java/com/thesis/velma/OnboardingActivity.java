@@ -1,5 +1,7 @@
 package com.thesis.velma;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -39,6 +41,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.Random;
 
 import static android.content.ContentValues.TAG;
@@ -69,6 +72,7 @@ public class OnboardingActivity extends AppCompatActivity {
     public static String geolocation;
     String modetravel = "driving";
     PlaceAutocompleteFragment autocompleteFragment;
+    private PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,26 +203,74 @@ public class OnboardingActivity extends AppCompatActivity {
                 final String notify = OnboardingFragment2.alarming.getText().toString();
                 final String invitedContacts = OnboardingFragment3.mtxtinvited.getText().toString();
 
-
-                //Toast.makeText(getBaseContext(), startDate + ":" + endDate, Toast.LENGTH_SHORT).show();
-
-
                 Log.d("StarTime", startDate + " " + startTime);
                 Log.d("EndTime", endDate + " " + endTime);
+
+
+                String[] mydates = startDate.split("-");
+                String[] mytimes = startTime.split(":");
+
+
+                //HARDCODED VALUES 10:51
+                Calendar calNow = Calendar.getInstance();
+                Calendar calSet = (Calendar) calNow.clone();
+
+
+                Log.d("Calendar.YEAR", "" + Integer.parseInt(mydates[2]));
+                Log.d("Calendar.MONTH", "" + Integer.parseInt(mydates[1]));
+                Log.d("Calendar.DATE", "" + Integer.parseInt(mydates[0]));
+                Log.d("Calendar.HOUR_OF_DAY", "" + Integer.parseInt(mytimes[0]));
+                Log.d("Calendar.MINUTE", "" + Integer.parseInt(mytimes[1]));
+
+                int AM_PM;
+                if (Integer.parseInt(mytimes[0]) < 12) {
+                    AM_PM = 0;
+                } else {
+                    AM_PM = 1;
+                }
+
+//                calSet.set(Calendar.YEAR, Integer.parseInt(mydates[2]));
+//                calSet.set(Calendar.MONTH, Integer.parseInt(mydates[1])-1);
+//                calSet.set(Calendar.DATE, Integer.parseInt(mydates[0]));
+//                calSet.set(Calendar.HOUR, Integer.parseInt(mytimes[0]));
+//                calSet.set(Calendar.MINUTE, Integer.parseInt(mytimes[1]));
+//                calSet.set(Calendar.SECOND, 0);
+//                calSet.set(Calendar.MILLISECOND, 0);
+//                calSet.set(Calendar.AM_PM, AM_PM);
+
+                calSet.setTimeInMillis(System.currentTimeMillis());
+                calSet.clear();
+                calSet.set(Integer.parseInt(mydates[2]), Integer.parseInt(mydates[1]) - 1, Integer.parseInt(mydates[0]), Integer.parseInt(mytimes[0]), Integer.parseInt(mytimes[1]));
+              
+
+                Intent myIntent = new Intent(context, AlarmReceiver.class);
+                myIntent.putExtra("name", name);
+                pendingIntent = PendingIntent.getBroadcast(context, 0, myIntent, 0);
+
+
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, calSet.getTimeInMillis(), pendingIntent);
+
+
+//                Calendar myAlarmDate = Calendar.getInstance();
+//                myAlarmDate.setTimeInMillis(System.currentTimeMillis());
+//                //myAlarmDate.set(Integer.parseInt(mydates[1]), 11, 25, 12, 00, 0);
+//                myAlarmDate.set(Integer.parseInt(mydates[2]), Integer.parseInt(mydates[1]), Integer.parseInt(mydates[0]), Integer.parseInt(mytimes[0]), Integer.parseInt(mytimes[1]), 0);
+//                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//
+//                Intent _myIntent = new Intent(context, Alarm_Receiver.class);
+//                _myIntent.putExtra("MyMessage", name);
+//                PendingIntent _myPendingIntent = PendingIntent.getBroadcast(context, 123, _myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//                alarmManager.set(AlarmManager.RTC_WAKEUP, myAlarmDate.getTimeInMillis(), _myPendingIntent);
 
 
                 if (name.isEmpty()) {
                     Toast.makeText(context, "Invalid Event Name", Toast.LENGTH_SHORT).show();
                 } else if (eventDescription.isEmpty()) {
                     Toast.makeText(context, "Invalid Event Description", Toast.LENGTH_SHORT).show();
-                }
-// else if (eventLocation.isEmpty()) {
-//                    Toast.makeText(context, "Invalid Event Location", Toast.LENGTH_SHORT).show();
-//                }
-                else if (startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
+                } else if (startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
                     Toast.makeText(context, "Please add Starting date and completion date.", Toast.LENGTH_SHORT).show();
                 } else {
-
 
                     LandingActivity.db.saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
                     OkHttp.getInstance(getBaseContext()).saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);

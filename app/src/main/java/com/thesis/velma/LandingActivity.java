@@ -425,12 +425,12 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
                 mAgendaCalendarView.init(eventList, minDate, maxDate, Locale.getDefault(), this);
 
 
-                //HARDCODED VALUES 10:51
+//                //HARDCODED VALUES 10:51
 //                Calendar calNow = Calendar.getInstance();
 //                Calendar calSet = (Calendar) calNow.clone();
 //
-//                calSet.set(Calendar.HOUR_OF_DAY, 3);
-//                calSet.set(Calendar.MINUTE, 50);
+//                calSet.set(Calendar.HOUR_OF_DAY, 4);
+//                calSet.set(Calendar.MINUTE, 45);
 //                calSet.set(Calendar.SECOND, 0);
 //                calSet.set(Calendar.MILLISECOND, 0);
 //

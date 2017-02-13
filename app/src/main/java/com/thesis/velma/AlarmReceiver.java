@@ -24,10 +24,11 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         Ringtone ringtone = RingtoneManager.getRingtone(context, uri);
         ringtone.play();
-        showNotification();
+
+        showNotification(intent.getStringExtra("name"));
     }
 
-    private void showNotification() {
+    private void showNotification(String eventname) {
         String eventDescription = "Alarm for an Event.";
 
         android.support.v4.app.NotificationCompat.BigTextStyle bigStyle = new android.support.v4.app.NotificationCompat.BigTextStyle();
@@ -35,7 +36,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
         Notification notification = new android.support.v4.app.NotificationCompat.Builder(mcontext)
                 .setSmallIcon(R.drawable.velmalogo)
-                .setContentTitle("Event")
+                .setContentTitle(eventname)
                 .setContentText(eventDescription).setStyle(bigStyle)
                 .extend(new android.support.v4.app.NotificationCompat.WearableExtender().setHintShowBackgroundOnly(true))
                 .build();
