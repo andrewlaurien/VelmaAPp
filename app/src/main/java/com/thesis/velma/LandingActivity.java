@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -94,7 +95,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
     String eventID;
 
 
-    public static String profilename;
+    public static String profilename, imei;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +115,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mcontext);
 // then you use
         profilename = prefs.getString("FullName", null);
+        imei = prefs.getString("imei", null);
 
 
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -137,19 +139,6 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
 
             getCurrentLocation();
 
-//            PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-//                    .getCurrentPlace(google_api_client, null);
-//            result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
-//                @Override
-//                public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-//                    for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-//                        Log.i(TAG, String.format("Place '%s' has likelihood: %g",
-//                                placeLikelihood.getPlace().getName(),
-//                                placeLikelihood.getLikelihood()));
-//                    }
-//                    likelyPlaces.release();
-//                }
-//            });
 
         } else {
             ActivityCompat.requestPermissions(this, new String[]{
@@ -172,6 +161,8 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
 //
 //        Log.d("StarTime", formatter.format(sdate));
 //        Log.d("EndTime", formatter.format(edate));
+
+        OkHttp.getInstance(mcontext).fetchEvents("0000", "a");
 
 
     }
@@ -258,9 +249,6 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
 
     @Override
     public void onEventSelected(final CalendarEvent event) {
-        //  Log.d(LOG_TAG, String.format("Selected event: %s", event));
-        //Toast.makeText(getBaseContext(), "" + event.getId(), Toast.LENGTH_SHORT).show();
-
 
         if (event.getId() != 0) {
 
@@ -347,12 +335,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
     @Override
     public void onConnected(Bundle arg0) {
         is_signInBtn_clicked = false;
-        // Get user's information and set it into the layout
 
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        prefs.edit().putBoolean("isLoggedIn", true).commit();
-//        Intent i = new Intent(LandingActivity.this, LandingActivity.class);
-//        startActivity(i);
     }
 
     @Override
@@ -390,20 +373,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
     @Override
     protected void onActivityResult(int requestCode, int responseCode,
                                     Intent intent) {
-        // Check which request we're responding to
-//        if (requestCode == SIGN_IN_CODE) {
-//            request_code = requestCode;
-//            if (responseCode != RESULT_OK) {
-//                is_signInBtn_clicked = false;
-//
-//            }
-//
-//            is_intent_inprogress = false;
-//
-//            if (!google_api_client.isConnecting()) {
-//                google_api_client.connect();
-//            }
-//        }
+
 
         if (requestCode == CREATE_EVENT) {
 
@@ -457,6 +427,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
         String dateString1 = "", dateString2;
         Calendar sdate = null, edate = null;
 
+        //  Toast.makeText(getBaseContext(), "" + cursor.getCount(), Toast.LENGTH_SHORT).show();
 
         while (cursor.moveToNext()) {
 
@@ -465,6 +436,9 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
 
             dateString1 = cursor.getString(cursor.getColumnIndex("StartDate"));
             dateString2 = cursor.getString(cursor.getColumnIndex("EndDate"));
+
+            Log.d("MyDates1", "" + dateString1);
+            Log.d("MyDates2", "" + dateString2);
 
 
             try {
@@ -479,10 +453,6 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
 
             Log.d("MyDate", "" + sdate.get(Calendar.DATE));
 
-
-//            public BaseCalendarEvent( long id, int color, String title,
-//                    String description, String location,long dateStart, long dateEnd,
-//            int allDay, String duration){
 
             Random rnd = new Random();
 
@@ -513,42 +483,20 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                LoadEvents();
+                return true;
+        }
+        return false;
+    }
+
 
     protected String getEventTitle(Calendar time) {
         return String.format("Event of %02d:%02d %s/%d", time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE), time.get(Calendar.MONTH) + 1, time.get(Calendar.DAY_OF_MONTH));
     }
-
-
-    private void gPlusSignOut() {
-        if (google_api_client.isConnected()) {
-            Plus.AccountApi.clearDefaultAccount(google_api_client);
-            google_api_client.disconnect();
-
-
-//                Auth.GoogleSignInApi.signOut(google_api_client).setResultCallback(
-//                        new ResultCallback<Status>() {
-//                            @Override
-//                            public void onResult(Status status) {
-////                                Plus.AccountApi.clearDefaultAccount(google_api_client);
-////                                google_api_client.disconnect();
-//                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//                                prefs.edit().putBoolean("isLoggedIn", false).commit();
-//                                Intent intent = new Intent(LandingActivity.this, LoginActivity.class);
-//                                startActivity(intent);
-//                            }
-//                        });
-
-        }
-    }
-
-//    private void gPlusSignOut() {
-////        if (google_api_client.isConnected()) {
-////            Plus.AccountApi.clearDefaultAccount(google_api_client);
-////            google_api_client.disconnect();
-////            google_api_client.connect();
-////
-////        }
-////    }
 
 
     @Override
@@ -561,12 +509,6 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
 
         if (!is_intent_inprogress) {
 
-//            connection_result = result;
-
-//            if (is_signInBtn_clicked) {
-//
-//                resolveSignInError();
-//            }
         }
 
     }

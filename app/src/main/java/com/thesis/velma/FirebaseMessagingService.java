@@ -32,7 +32,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
-        LandingActivity.db.saveEvent(Long.parseLong(remoteMessage.getData().get("eventid")),
+        LandingActivity.db.saveEvent(remoteMessage.getData().get("userid"),Long.parseLong(remoteMessage.getData().get("eventid")),
                 remoteMessage.getData().get("eventname"), remoteMessage.getData().get("eventDescription"), remoteMessage.getData().get("eventLocation")
                 , remoteMessage.getData().get("eventStartDate"), remoteMessage.getData().get("eventStartTime"),
                 remoteMessage.getData().get("eventEndDate"), remoteMessage.getData().get("eventEndTime"), remoteMessage.getData().get("notify"),

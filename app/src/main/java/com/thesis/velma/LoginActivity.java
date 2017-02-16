@@ -6,6 +6,7 @@ package com.thesis.velma;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -266,6 +267,7 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
             prefs.edit().putBoolean("isLoggedIn", true).commit();
             prefs.edit().putString("FullName", mFullName).commit();
             prefs.edit().putString("Email", mEmail).commit();
+            prefs.edit().putString("imei", imei).commit();
 
             OkHttp.getInstance(mcontext).saveProfile(imei, mEmail, mFullName);
         } else
@@ -458,6 +460,13 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                             for (Name name : names)
                                 nameList.add(name.getDisplayName());
 
+                        Intent intent = new Intent(mcontext, LandingActivity.class);
+                        mcontext.startActivity(intent);
+                        ((Activity) mcontext).finish();
+
+                    } else {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mcontext);
+                        prefs.edit().putBoolean("isLoggedIn", false).commit();
                     }
                 }
 
@@ -478,33 +487,4 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
 
 
     //endregion
-
-
-//    @Override
-//    public void onResult(LoadPeopleResult peopleData) {
-//        Toast.makeText(getBaseContext(), peopleData.getStatus().getStatusCode(), Toast.LENGTH_SHORT).show();
-//        if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
-//            PersonBuffer personBuffer = peopleData.getPersonBuffer();
-//            ArrayList<String> list = new ArrayList<String>();
-//            ArrayList<String> img_list = new ArrayList<String>();
-//            try {
-//                int count = personBuffer.getCount();
-//
-//                for (int i = 0; i < count; i++) {
-//                    list.add(personBuffer.get(i).getDisplayName());
-//                    img_list.add(personBuffer.get(i).getImage().getUrl());
-//                }
-//                Intent intent = new Intent(LoginActivity.this, FriendActivity.class);
-//                intent.putStringArrayListExtra("friendsName", list);
-//                intent.putStringArrayListExtra("friendsPic", img_list);
-//                startActivity(intent);
-//            } finally {
-//                personBuffer.release();
-//            }
-//        } else {
-//            Log.e("circle error", "Error requesting visible circles: " + peopleData.getStatus());
-//        }
-//    }
-
-
 }

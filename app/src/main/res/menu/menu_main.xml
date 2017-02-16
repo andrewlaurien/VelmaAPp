@@ -3,15 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="num.app.gpluslogin.MainActivity">
 
-    <item android:id="@+id/action_save"
-        android:title="@string/action_save"
-        android:orderInCategory="100"
+    <item
+        android:id="@+id/action_save"
         android:icon="@drawable/ic_check_white_18dp"
-        app:showAsAction="always"/>
-    <item android:id="@+id/action_edit"
-        android:title="@string/action_today"
         android:orderInCategory="100"
+        android:title="@string/action_save"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_edit"
         android:icon="@drawable/ic_edit_white_18dp"
-        app:showAsAction="always"/>
+        android:orderInCategory="100"
+        android:title="@string/action_today"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/quantum_ic_refresh_white_24"
+        android:orderInCategory="100"
+        android:title="@string/action_today"
+        app:showAsAction="always" />
+
 
 </menu>

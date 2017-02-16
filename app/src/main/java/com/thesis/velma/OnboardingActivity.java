@@ -272,16 +272,14 @@ public class OnboardingActivity extends AppCompatActivity {
                     Toast.makeText(context, "Please add Starting date and completion date.", Toast.LENGTH_SHORT).show();
                 } else {
 
-                    LandingActivity.db.saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
+
+                    LandingActivity.db.saveEvent(LandingActivity.imei,unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
                     OkHttp.getInstance(getBaseContext()).saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
 
                     for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
-
                         String[] target = OnboardingFragment3.invitedContacts.get(i).split("@");
-
                         OkHttp.getInstance(context).sendNotification(unixtime, name, eventDescription, eventLocation,
                                 startDate, startTime, endDate, endTime, notify, invitedContacts, target[0] + "Velma");
-
                     }
 
                     Intent intent = new Intent();
