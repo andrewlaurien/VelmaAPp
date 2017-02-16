@@ -162,7 +162,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
 //        Log.d("StarTime", formatter.format(sdate));
 //        Log.d("EndTime", formatter.format(edate));
 
-        OkHttp.getInstance(mcontext).fetchEvents("0000", "a");
+//        OkHttp.getInstance(mcontext).fetchEvents("0000", "a");
 
 
     }
