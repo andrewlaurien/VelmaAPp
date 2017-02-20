@@ -241,7 +241,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 calSet.setTimeInMillis(System.currentTimeMillis());
                 calSet.clear();
                 calSet.set(Integer.parseInt(mydates[2]), Integer.parseInt(mydates[1]) - 1, Integer.parseInt(mydates[0]), Integer.parseInt(mytimes[0]), Integer.parseInt(mytimes[1]));
-              
+
 
                 Intent myIntent = new Intent(context, AlarmReceiver.class);
                 myIntent.putExtra("name", name);
@@ -273,13 +273,13 @@ public class OnboardingActivity extends AppCompatActivity {
                 } else {
 
 
-                    LandingActivity.db.saveEvent(LandingActivity.imei,unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
+                    LandingActivity.db.saveEvent(LandingActivity.imei, unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
                     OkHttp.getInstance(getBaseContext()).saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
 
                     for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
                         String[] target = OnboardingFragment3.invitedContacts.get(i).split("@");
-                        OkHttp.getInstance(context).sendNotification(unixtime, name, eventDescription, eventLocation,
-                                startDate, startTime, endDate, endTime, notify, invitedContacts, target[0] + "Velma");
+                        OkHttp.getInstance(context).sendNotification("Invitation",unixtime, name, eventDescription, eventLocation,
+                                startDate, startTime, endDate, endTime, notify, invitedContacts, "socia.andrewVelma");//target[0]
                     }
 
                     Intent intent = new Intent();

@@ -41,7 +41,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.thesis.velma.apiclient.MyEvent;
+import com.thesis.velma.helper.CheckInternet;
 import com.thesis.velma.helper.DataBaseHandler;
+import com.thesis.velma.helper.NetworkUtil;
 import com.thesis.velma.helper.OkHttp;
 
 import java.text.ParseException;
@@ -95,7 +97,14 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
     String eventID;
 
 
-    public static String profilename, imei;
+    public static String profilename, imei, useremail;
+    String[] invitedFriends = null;
+
+
+    CheckInternet connectCheck;
+    Long unixtime = null;
+    String name, eventDescription, eventLocation,
+            startDate, startTime, endDate, endTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,14 +118,14 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
         mAgendaCalendarView = (AgendaCalendarView) findViewById(R.id.agenda_calendar_view);
         mcontext = this;
 
-
         db = new DataBaseHandler(mcontext);
+        connectCheck = new CheckInternet(this);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mcontext);
-// then you use
+        //then you use
         profilename = prefs.getString("FullName", null);
         imei = prefs.getString("imei", null);
-
+        useremail = prefs.getString("Email", null);
 
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent myIntent = new Intent(this, AlarmReceiver.class);
@@ -171,9 +180,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
 
-
             case LOCATION_REQUEST:
-
                 getCurrentLocation();
                 break;
         }
@@ -202,9 +209,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED) {
 
-
             // Acquire a reference to the system Location Manager
-
 
             origlatitude = 10.3157007;
             origlongitude = 123.88544300000001;
@@ -253,7 +258,9 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
         if (event.getId() != 0) {
 
             String content = "";
+
             Cursor c = db.getEventDetails(event.getId());
+
 
             while (c.moveToNext()) {
 
@@ -265,6 +272,19 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
                         "EndTime: " + c.getString(c.getColumnIndex("EndTime")) + "\n";
 
                 eventID = c.getString(c.getColumnIndex("EventID"));
+                invitedFriends = c.getString(c.getColumnIndex("Extra1")).split(",");
+
+
+                unixtime = c.getLong(c.getColumnIndex("EventID"));
+                name = c.getString(c.getColumnIndex("EventName"));
+                eventDescription = c.getString(c.getColumnIndex("EventDescription"));
+                eventLocation = c.getString(c.getColumnIndex("EventLocation"));
+                startDate = c.getString(c.getColumnIndex("StartDate"));
+                endDate = c.getString(c.getColumnIndex("EndDate"));
+                endTime = c.getString(c.getColumnIndex("EndTime"));
+                startTime = c.getString(c.getColumnIndex("StartTime"));
+                startDate = c.getString(c.getColumnIndex("StartDate"));
+
 
             }
 
@@ -290,10 +310,28 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             // TODO
-                            db.deleteEvent(event.getId());
-                            OkHttp.getInstance(mcontext).deleteEvent(eventID);
-                            dialog.dismiss();
-                            LoadEvents();
+
+                            int status = NetworkUtil.getConnectivityStatusString(mcontext);
+
+                            if (status == 0) {
+                                CheckInternet.showConnectionDialog(mcontext);
+                            } else {
+
+                                db.deleteEvent(event.getId());
+
+
+                                for (int i = 0; i <= invitedFriends.length - 1; i++) {
+                                    String[] target = invitedFriends[i].split("@");
+                                    OkHttp.getInstance(mcontext).sendNotification("DeleteEvent", unixtime, name, eventDescription, eventLocation,
+                                            startDate, startTime, endDate, endTime, "", "", "socia.andrewVelma");//target[0]
+                                }
+
+                                OkHttp.getInstance(mcontext).deleteEvent(eventID);
+                                dialog.dismiss();
+                                LoadEvents();
+                            }
+
+
                         }
                     })
                     .onAny(new MaterialDialog.SingleButtonCallback() {
@@ -365,9 +403,70 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
         // Toast.makeText(getBaseContext(), "" + view, Toast.LENGTH_LONG).show();
 
         if (view == fab) {
-            Intent intent = new Intent(LandingActivity.this, OnboardingActivity.class);
-            startActivityForResult(intent, CREATE_EVENT);
+
+
+            int status = NetworkUtil.getConnectivityStatusString(mcontext);
+
+            if (status == 0) {
+                CheckInternet.showConnectionDialog(mcontext);
+            } else {
+
+                Intent intent = new Intent(LandingActivity.this, OnboardingActivity.class);
+                startActivityForResult(intent, CREATE_EVENT);
+
+            }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+
+                int status = NetworkUtil.getConnectivityStatusString(mcontext);
+
+                if (status == 0) {
+                    CheckInternet.showConnectionDialog(mcontext);
+                } else {
+
+                    OkHttp.getInstance(mcontext).fetchEvents(LandingActivity.imei, LandingActivity.useremail);
+                    LoadEvents();
+                }
+                return true;
+        }
+        return false;
+    }
+
+
+    protected String getEventTitle(Calendar time) {
+        return String.format("Event of %02d:%02d %s/%d", time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE), time.get(Calendar.MONTH) + 1, time.get(Calendar.DAY_OF_MONTH));
+    }
+
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+        if (!connectionResult.hasResolution()) {
+            google_api_availability.getErrorDialog(this, connectionResult.getErrorCode(), request_code).show();
+            return;
+        }
+
+        if (!is_intent_inprogress) {
+
+        }
+
+    }
+
+
+    @Override
+    public void onResult(@NonNull People.LoadPeopleResult loadPeopleResult) {
+
     }
 
     @Override
@@ -477,45 +576,5 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
 
     //endregion
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_refresh:
-                LoadEvents();
-                return true;
-        }
-        return false;
-    }
-
-
-    protected String getEventTitle(Calendar time) {
-        return String.format("Event of %02d:%02d %s/%d", time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE), time.get(Calendar.MONTH) + 1, time.get(Calendar.DAY_OF_MONTH));
-    }
-
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-        if (!connectionResult.hasResolution()) {
-            google_api_availability.getErrorDialog(this, connectionResult.getErrorCode(), request_code).show();
-            return;
-        }
-
-        if (!is_intent_inprogress) {
-
-        }
-
-    }
-
-
-    @Override
-    public void onResult(@NonNull People.LoadPeopleResult loadPeopleResult) {
-
-    }
 }

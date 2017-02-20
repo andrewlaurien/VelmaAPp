@@ -51,13 +51,18 @@ import com.google.api.services.people.v1.model.Name;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.thesis.velma.helper.CheckInternet;
 import com.thesis.velma.helper.DataBaseHandler;
+import com.thesis.velma.helper.NetworkUtil;
 import com.thesis.velma.helper.OkHttp;
 import com.thesis.velma.helper.PeopleHelper;
+import com.thesis.velma.helper.progressDialog;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.thesis.velma.R.id.sign_in_button;
 
 
 public class LoginActivity extends AppCompatActivity implements OnConnectionFailedListener, View.OnClickListener, ConnectionCallbacks {
@@ -103,12 +108,44 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
 
     DataBaseHandler db;
 
+    CheckInternet connectCheck;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //this function calls the google_api_client
-        //buidNewGoogleApiClient();
+        setContentView(R.layout.activity_main);
+
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Boolean isFirstRun = prefs.getBoolean("isFirstRun", false);
+        Boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
+        Boolean isLoggedOut = prefs.getBoolean("isLoggedOut", true);
+
+        signIn_btn = (SignInButton) findViewById(sign_in_button);
+        signIn_btn.setSize(SignInButton.SIZE_STANDARD);
+        signIn_btn.setOnClickListener(this);
+
+        connectCheck = new CheckInternet(this);
+
+        if (isFirstRun) {
+            prefs.edit().putBoolean("isFirstRun", true).commit();
+
+            if (isLoggedIn) {
+                // "Landing";
+                this.finish();
+                prefs.edit().putBoolean("isLoggedIn", true).commit();
+                //Toast.makeText(getBaseContext(), "1", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(this, LandingActivity.class);
+                startActivity(i);
+            } else {
+
+                // Toast.makeText(getBaseContext(), "2", Toast.LENGTH_SHORT).show();
+                signIn_btn.setVisibility(View.VISIBLE);
+            }
+
+        }
+
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestProfile()
@@ -118,76 +155,41 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                 .requestScopes(new Scope("https://www.googleapis.com/auth/contacts.readonly"))
                 .build();
 
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                // The serverClientId is an OAuth 2.0 web client ID
-//                .requestServerAuthCode(getString(R.string.client_id))
-//                .requestProfile()
-//                .requestEmail()
-//                .requestScopes(new Scope(Scopes.PLUS_LOGIN),
-//                        new Scope(Scopes.PROFILE),
-//                        new Scope(PeopleScopes.CONTACTS_READONLY),
-//                        new Scope(PeopleScopes.USER_EMAILS_READ),
-//                        new Scope(PeopleScopes.USERINFO_EMAIL),
-//                        new Scope(PeopleScopes.USER_PHONENUMBERS_READ))
-//                .build();
-
-        // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         google_api_client = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .addApi(Plus.API)
                 .addApi(AppIndex.API).build();
 
-        setContentView(R.layout.activity_main);
-        //Customize sign-in button.a red button may be displayed when Google+ scopes are requested
-        custimizeSignBtn();
-        //handles the onclick for sign in button
-        setBtnClickListeners();
+
         progress_dialog = new ProgressDialog(this);
         progress_dialog.setMessage("Signing in....");
+
+        boolean firstRun = getPreferences(Context.MODE_PRIVATE).getBoolean("itsMyFirst", true);
+
+        if (firstRun) {
+            signIn_btn.setVisibility(View.VISIBLE);
+            //Toast.makeText(getBaseContext(), "2", Toast.LENGTH_SHORT).show();
+            Intent mainAppIntent = new Intent(this, TutorialActivity.class);
+            startActivity(mainAppIntent);
+            getPreferences(Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("itsMyFirst", false)
+                    .commit();
+
+            prefs.edit().putBoolean("isLoggedIn", false).commit();
+        }
 
 
         mcontext = this;
 
         db = new DataBaseHandler(mcontext);
 
-
-        // Here, thisActivity is the current activity
-//        if (ContextCompat.checkSelfPermission(this,
-//                android.Manifest.permission.GET_ACCOUNTS)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            // Should we show an explanation?
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                    android.Manifest.permission.GET_ACCOUNTS)) {
-//                showPermissionDialog();
-//
-//            } else {
-//                ActivityCompat.requestPermissions(this,
-//                        new String[]{Manifest.permission.GET_ACCOUNTS},
-//                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-//
-//            }
-//            return;
-//        }
-
-//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                    android.Manifest.permission.READ_PHONE_STATE)) {
-//                showPermissionDialog();
-//            } else {
-//                ActivityCompat.requestPermissions(this,
-//                        new String[]{android.Manifest.permission.READ_PHONE_STATE},
-//                        MY_PERMISSIONS_REQUEST_READ_PHONE);
-//            }
-//        } else {
-//            continueLogin();
-//        }
-
         if (checkPermissions()) {
 
         }
-        //  permissions  granted.
+
+
     }
 
 
@@ -213,6 +215,8 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
     public void continueLogin() {
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         imei = telephonyManager.getDeviceId();
+
+        buidNewGoogleApiClient();
     }
 
     public void showPermissionDialog() {
@@ -230,27 +234,18 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
     }
 
 
-    private void custimizeSignBtn() {
-        signIn_btn = (SignInButton) findViewById(R.id.sign_in_button);
-        signIn_btn.setSize(SignInButton.SIZE_STANDARD);
-        signIn_btn.setScopes(new Scope[]{Plus.SCOPE_PLUS_LOGIN});
-    }
-
-
     private void buidNewGoogleApiClient() {
+
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(google_api_client);
         startActivityForResult(signInIntent, 0002);
 
     }
 
-    private void setBtnClickListeners() {
-        signIn_btn.setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-    }
 
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
+            progressDialog.showDialog(mcontext, "Velma", "Signing In. Please wait...", false);
 
             GoogleSignInAccount acct = result.getSignInAccount();
             // Get account information
@@ -273,6 +268,7 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
         } else
 
         {
+            progressDialog.hideDialog();
             changeUI(false);
         }
 
@@ -280,10 +276,10 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
 
     private void changeUI(boolean signedIn) {
         if (signedIn) {
-            findViewById(R.id.sign_in_button).setVisibility(View.GONE);
+            findViewById(sign_in_button).setVisibility(View.GONE);
         } else {
 
-            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+            findViewById(sign_in_button).setVisibility(View.VISIBLE);
         }
     }
 
@@ -291,6 +287,33 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
     //endregion
 
     //region LISTENERS
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case sign_in_button:
+
+                int status = NetworkUtil.getConnectivityStatusString(mcontext);
+
+                if (status == 0) {
+                    CheckInternet.showConnectionDialog(mcontext);
+                } else {
+
+
+                    if (checkPermissions()) {
+                        // Toast.makeText(getBaseContext(), "1", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //  Toast.makeText(getBaseContext(), "2", Toast.LENGTH_SHORT).show();
+                        buidNewGoogleApiClient();
+                    }
+                    // buidNewGoogleApiClient();
+
+                }
+
+
+                break;
+        }
+    }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
@@ -343,9 +366,10 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
 
 
                     continueLogin();
+
                 } else {
                     // no permissions granted.
-                    this.finish();
+                    // this.finish();
                 }
                 break;
         }
@@ -362,31 +386,11 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
     public void onConnectionSuspended(int arg0) {
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.sign_in_button:
-                buidNewGoogleApiClient();
-
-                break;
-        }
-    }
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Login Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
 
     @Override
     public void onStart() {
@@ -406,6 +410,18 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(google_api_client, getIndexApiAction());
         google_api_client.disconnect();
+    }
+
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Login Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
     }
 
 
@@ -460,6 +476,7 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
                             for (Name name : names)
                                 nameList.add(name.getDisplayName());
 
+                        progressDialog.hideDialog();
                         Intent intent = new Intent(mcontext, LandingActivity.class);
                         mcontext.startActivity(intent);
                         ((Activity) mcontext).finish();

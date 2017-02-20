@@ -29,7 +29,7 @@ android {
         multiDexEnabled true
         applicationId "com.thesis.velma"
         minSdkVersion 19
-        targetSdkVersion 23
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }

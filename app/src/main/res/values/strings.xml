@@ -64,4 +64,6 @@
     </string-array>
 
     <string name="title_activity_location">Location</string>
+    <string name="title_activity_accept_event">Accept</string>
+    <string name="title_activity_decline_event">Decline</string>
 </resources>

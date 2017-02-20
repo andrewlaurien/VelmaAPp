@@ -124,8 +124,8 @@ public class OnboardingFragment3 extends Fragment implements GoogleApiClient.OnC
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 // When clicked, show a toast with the TextView text
-                Toast.makeText(getContext(), ((TextView) view).getText(),
-                        Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), ((TextView) view).getText(),
+                //        Toast.LENGTH_SHORT).show();
                 invitedContacts.add(((TextView) view).getText().toString());
 
             }

@@ -50,7 +50,7 @@ public class RingtonePlayingService extends Service {
         NotificationManager notify_manager = (NotificationManager)
                 getSystemService(NOTIFICATION_SERVICE);
         // set up an intent that goes to the Main Activity
-        Intent intent_main_activity = new Intent(this.getApplicationContext(), MainActivity.class);
+        Intent intent_main_activity = new Intent(this.getApplicationContext(), LandingActivity.class);
         // set up a pending intent
         PendingIntent pending_intent_main_activity = PendingIntent.getActivity(this, 0,
                 intent_main_activity, 0);
@@ -63,8 +63,6 @@ public class RingtonePlayingService extends Service {
                 .setContentIntent(pending_intent_main_activity)
                 .setAutoCancel(true)
                 .build();
-
-
 
 
         // this converts the extra strings from the intent
@@ -98,7 +96,6 @@ public class RingtonePlayingService extends Service {
             notify_manager.notify(0, notification_popup);
 
 
-
             // play the whale sound depending on the passed whale choice id
 
             if (whale_sound_choice == 0) {
@@ -109,127 +106,100 @@ public class RingtonePlayingService extends Service {
 
                 Random random_number = new Random();
                 int whale_number = random_number.nextInt(maximum_number + minimum_number);
-                Log.e("random number is " , String.valueOf(whale_number));
+                Log.e("random number is ", String.valueOf(whale_number));
 
 
                 if (whale_number == 1) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 2) {
+                } else if (whale_number == 2) {
                     // create an instance of the media player
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     // start the ringtone
                     media_song.start();
-                }
-                else if (whale_number == 3) {
+                } else if (whale_number == 3) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 4) {
+                } else if (whale_number == 4) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 5) {
+                } else if (whale_number == 5) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 6) {
+                } else if (whale_number == 6) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 7) {
+                } else if (whale_number == 7) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 8) {
+                } else if (whale_number == 8) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 9) {
+                } else if (whale_number == 9) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 10) {
+                } else if (whale_number == 10) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 11) {
+                } else if (whale_number == 11) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 12) {
+                } else if (whale_number == 12) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else if (whale_number == 13) {
+                } else if (whale_number == 13) {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
-                }
-                else {
+                } else {
                     media_song = MediaPlayer.create(this, R.raw.superhuman);
                     media_song.start();
                 }
 
 
-            }
-            else if (whale_sound_choice == 1) {
+            } else if (whale_sound_choice == 1) {
                 // create an instance of the media player
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 // start the ringtone
                 media_song.start();
-            }
-            else if (whale_sound_choice == 2) {
+            } else if (whale_sound_choice == 2) {
                 // create an instance of the media player
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 // start the ringtone
                 media_song.start();
-            }
-            else if (whale_sound_choice == 3) {
+            } else if (whale_sound_choice == 3) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 4) {
+            } else if (whale_sound_choice == 4) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 5) {
+            } else if (whale_sound_choice == 5) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 6) {
+            } else if (whale_sound_choice == 6) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 7) {
+            } else if (whale_sound_choice == 7) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 8) {
+            } else if (whale_sound_choice == 8) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 9) {
+            } else if (whale_sound_choice == 9) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 10) {
+            } else if (whale_sound_choice == 10) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 11) {
+            } else if (whale_sound_choice == 11) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 12) {
+            } else if (whale_sound_choice == 12) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else if (whale_sound_choice == 13) {
+            } else if (whale_sound_choice == 13) {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
-            }
-            else {
+            } else {
                 media_song = MediaPlayer.create(this, R.raw.superhuman);
                 media_song.start();
             }
@@ -279,7 +249,6 @@ public class RingtonePlayingService extends Service {
         }
 
 
-
         return START_NOT_STICKY;
     }
 
@@ -291,7 +260,6 @@ public class RingtonePlayingService extends Service {
         super.onDestroy();
         this.isRunning = false;
     }
-
 
 
 }

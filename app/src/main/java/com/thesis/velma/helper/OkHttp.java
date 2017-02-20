@@ -253,12 +253,13 @@ public class OkHttp {
 
     }
 
-    public void sendNotification(Long eventid, String eventname, String eventDescription, String eventLocation,
+    public void sendNotification(String invitationTitle, Long eventid, String eventname, String eventDescription, String eventLocation,
                                  String eventStartDate, String eventStartTime, String eventEndDate,
                                  String eventEndTime, String notify, String invitedfirends, String target) {
 
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse("http://velma.000webhostapp.com/sendNotification.php").newBuilder();
+        urlBuilder.addQueryParameter("invitationTitle", invitationTitle);
         urlBuilder.addQueryParameter("userid", "" + LandingActivity.imei);
         urlBuilder.addQueryParameter("eventid", "" + eventid);
         urlBuilder.addQueryParameter("eventname", eventname);

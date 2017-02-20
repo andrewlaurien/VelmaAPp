@@ -1,7 +1,6 @@
 package com.thesis.velma;
 
 import android.app.Notification;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -38,19 +37,23 @@ public class TutorialActivity extends FragmentActivity {
 
         showNotification();
 
-        pager = (ViewPager)findViewById(R.id.pager);
-        indicator = (SmartTabLayout)findViewById(R.id.indicator);
-        skipbutton = (Button)findViewById(R.id.skip);
-        next = (Button)findViewById(R.id.next);
+        pager = (ViewPager) findViewById(R.id.pager);
+        indicator = (SmartTabLayout) findViewById(R.id.indicator);
+        skipbutton = (Button) findViewById(R.id.skip);
+        next = (Button) findViewById(R.id.next);
 
         FragmentStatePagerAdapter adapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 switch (position) {
-                    case 0 : return new TutorialFragment1();
-                    case 1 : return new TutorialFragment2();
-                    case 2 : return new TutorialFragment3();
-                    default: return null;
+                    case 0:
+                        return new TutorialFragment1();
+                    case 1:
+                        return new TutorialFragment2();
+                    case 2:
+                        return new TutorialFragment3();
+                    default:
+                        return null;
                 }
             }
 
@@ -61,18 +64,17 @@ public class TutorialActivity extends FragmentActivity {
         };
 
         pager.setAdapter(adapter);
-
+        pager.setEnabled(false);
         indicator.setViewPager(pager);
 
         indicator.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
             @Override
             public void onPageSelected(int position) {
-                if(position == 2){
+                if (position == 2) {
                     skipbutton.setVisibility(View.GONE);
                     next.setText("Done");
-                }
-                else {
+                } else {
                     skipbutton.setVisibility(View.VISIBLE);
                     next.setText("Next");
                 }
@@ -90,7 +92,7 @@ public class TutorialActivity extends FragmentActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(pager.getCurrentItem() == 2){
+                if (pager.getCurrentItem() == 2) {
                     finishOnboarding();
                 } else {
                     pager.setCurrentItem(pager.getCurrentItem() + 1, true);
@@ -100,15 +102,6 @@ public class TutorialActivity extends FragmentActivity {
     }
 
     private void finishOnboarding() {
-//        SharedPreferences preferences =
-//                getSharedPreferences("my_preferences", MODE_PRIVATE);
-//
-//        preferences.edit()
-//                .putBoolean("onboarding_complete",false).apply();
-
-        Intent main = new Intent(this, LoginActivity.class);
-        startActivity(main);
-
         finish();
     }
 

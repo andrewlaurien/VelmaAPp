@@ -3,6 +3,7 @@ package com.thesis.velma;
 /**
  * Created by jeanneviegarciano on 7/20/2016.
  */
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,10 +12,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -35,12 +32,12 @@ public class SplashScreen extends AppCompatActivity {
     boolean isFirstRun;
 
 
-
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         Window window = getWindow();
         window.setFormat(PixelFormat.RGBA_8888);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,8 +56,7 @@ public class SplashScreen extends AppCompatActivity {
 //        Countdown _tik;
 //        _tik=new Countdown(5000,5000,this,LandingActivity.class);
 //        _tik.start();
-       // StartAnimations();
-
+        // StartAnimations();
 
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mcontext);
@@ -68,7 +64,7 @@ public class SplashScreen extends AppCompatActivity {
         Boolean isFirstRun = prefs.getBoolean("isFirstRun", false);
         Boolean isLoggedIn = prefs.getBoolean("isLoggedIn", true);
         Boolean isLoggedOut = prefs.getBoolean("isLoggedOut", true);
-        Toast.makeText(mcontext,""+isFirstRun, Toast.LENGTH_LONG).show();
+        Toast.makeText(mcontext, "" + isFirstRun, Toast.LENGTH_LONG).show();
 
         if (isFirstRun) {
 //maybe you want to check it by getting the sharedpreferences. Use this instead if (locked)
@@ -79,34 +75,34 @@ public class SplashScreen extends AppCompatActivity {
 //             Intent i = new Intent(SplashScreen.this,LoginActivity.class);
 //             startActivity(i);
 
-            if(isLoggedIn){
-               // "Landing";
+            if (isLoggedIn) {
+                // "Landing";
                 this.finish();
-                Intent i = new Intent(SplashScreen.this,LandingActivity.class);
+                Intent i = new Intent(SplashScreen.this, LandingActivity.class);
                 startActivity(i);
-            }
-            else{
-
-                Intent i = new Intent(SplashScreen.this,LoginActivity.class);
+            } else {
+                this.finish();
+                Intent i = new Intent(SplashScreen.this, LoginActivity.class);
                 startActivity(i);
-               // "Login";
+                // "Login";
             }
-
 
 
         } else {
+
             this.finish();
-
-            Intent i = new Intent(SplashScreen.this,TutorialActivity.class);
+            Intent i = new Intent(SplashScreen.this, LoginActivity.class);
             startActivity(i);
+//            Intent a = new Intent(SplashScreen.this,TutorialActivity.class);
+//            startActivity(a);
 
-          //  Toast.makeText(mcontext,"Tutorial",Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(mcontext,"Tutorial",Toast.LENGTH_SHORT).show();
 
 
             //startActivity(new Intent(mcontext, Tag1.class));
             //buidNewGoogleApiClient();
-           // Intent i = new Intent(SplashScreen.this,LoginActivity.class);
-           // startActivity(i);
+            // Intent i = new Intent(SplashScreen.this,LoginActivity.class);
+            // startActivity(i);
         }
 
 //        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -126,20 +122,20 @@ public class SplashScreen extends AppCompatActivity {
 
     }
 
-    private void StartAnimations() {
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
-        anim.reset();
-        LinearLayout l=(LinearLayout) findViewById(R.id.lin_lay);
-        l.clearAnimation();
-        l.startAnimation(anim);
-
-        anim = AnimationUtils.loadAnimation(this, R.anim.translate);
-        anim.reset();
-        ImageView iv = (ImageView) findViewById(R.id.logo);
-        iv.clearAnimation();
-        iv.startAnimation(anim);
-
-    }
+//    private void StartAnimations() {
+//        Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
+//        anim.reset();
+//        LinearLayout l=(LinearLayout) findViewById(R.id.lin_lay);
+//        l.clearAnimation();
+//        l.startAnimation(anim);
+//
+//        anim = AnimationUtils.loadAnimation(this, R.anim.translate);
+//        anim.reset();
+//        ImageView iv = (ImageView) findViewById(R.id.logo);
+//        iv.clearAnimation();
+//        iv.startAnimation(anim);
+//
+//    }
 
 
 }
