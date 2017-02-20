@@ -279,7 +279,7 @@ public class OnboardingActivity extends AppCompatActivity {
                     for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
                         String[] target = OnboardingFragment3.invitedContacts.get(i).split("@");
                         OkHttp.getInstance(context).sendNotification("Invitation",unixtime, name, eventDescription, eventLocation,
-                                startDate, startTime, endDate, endTime, notify, invitedContacts, "socia.andrewVelma");//target[0]
+                                startDate, startTime, endDate, endTime, notify, invitedContacts,target[0]+"Velma");//target[0]
                     }
 
                     Intent intent = new Intent();

@@ -323,7 +323,7 @@ public class LandingActivity extends AppCompatActivity implements CalendarPicker
                                 for (int i = 0; i <= invitedFriends.length - 1; i++) {
                                     String[] target = invitedFriends[i].split("@");
                                     OkHttp.getInstance(mcontext).sendNotification("DeleteEvent", unixtime, name, eventDescription, eventLocation,
-                                            startDate, startTime, endDate, endTime, "", "", "socia.andrewVelma");//target[0]
+                                            startDate, startTime, endDate, endTime, "", "", target[0] + "Velma");//target[0]
                                 }
 
                                 OkHttp.getInstance(mcontext).deleteEvent(eventID);
