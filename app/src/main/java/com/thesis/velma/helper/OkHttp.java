@@ -239,11 +239,46 @@ public class OkHttp {
                 if (response.code() == 200) {
                     // Run view-related code back on the main thread
 
+
+                    if (responseData.equalsIgnoreCase("Records added successfully.")){
+
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mcontext, "event successfully added.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
+//                        for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
+//                            String[] target = OnboardingFragment3.invitedContacts.get(i).split("@");
+//                            OkHttp.getInstance(context).sendNotification("Invitation", unixtime, name, eventDescription, eventLocation,
+//                                    startDate, startTime, endDate, endTime, notify, invitedContacts, target[0] + "Velma");//target[0]
+//                        }
+
+                    }
+                    else{
+
+
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mcontext, "Unable to add event. Conflicf Time", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
+
+
+
+
+
+
                 } else {
                     mainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(mcontext, "Faile to register", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mcontext, "Faile to save event", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

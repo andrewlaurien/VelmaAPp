@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -38,16 +39,28 @@ import org.apache.http.params.HttpParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Random;
 
+import okhttp3.Cache;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import static android.content.ContentValues.TAG;
 import static com.thesis.velma.OnboardingFragment2.dateEnd;
 import static com.thesis.velma.OnboardingFragment2.dateStart;
+import static com.thesis.velma.OnboardingFragment2.timeEnd;
 import static com.thesis.velma.OnboardingFragment2.timeStart;
+import static com.thesis.velma.OnboardingFragment3.mtxtinvited;
+
 
 /**
  * Created by jeanneviegarciano on 8/10/2016.
@@ -73,6 +86,19 @@ public class OnboardingActivity extends AppCompatActivity {
     String modetravel = "driving";
     PlaceAutocompleteFragment autocompleteFragment;
     private PendingIntent pendingIntent;
+    OkHttpClient client;
+    Handler mainHandler;
+
+//    String name = null;
+//    String eventDescription = null;
+//    String eventLocation = null;
+//    String startDate = null;
+//    String endDate = null;
+//    String startTime = null;
+//    String endTime = null;
+//    String notify = null;
+//    String invitedContacts = null;
+//    long unixtime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +113,10 @@ public class OnboardingActivity extends AppCompatActivity {
         getSupportActionBar().setElevation(0);
 
         context = this;
-
+        mainHandler = new Handler(context.getMainLooper());
+        int cacheSize = 10 * 1024 * 1024; // 10 MiB
+        Cache cache = new Cache(new File(context.getApplicationContext().getCacheDir(), "cacheFileName"), cacheSize);
+        client = new OkHttpClient.Builder().cache(cache).build();
         event = (EditText) findViewById(R.id.eventname);
         pager = (ViewPager) findViewById(R.id.pager);
         indicator = (SmartTabLayout) findViewById(R.id.indicator);
@@ -190,7 +219,7 @@ public class OnboardingActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Random r = new Random();
-                long unixtime = (long) (1293861599 + r.nextDouble() * 60 * 60 * 24 * 365);
+                Long unixtime = (long) (1293861599 + r.nextDouble() * 60 * 60 * 24 * 365);
 
 
                 final String name = event.getText().toString();
@@ -199,9 +228,19 @@ public class OnboardingActivity extends AppCompatActivity {
                 final String startDate = dateStart.getText().toString();
                 final String endDate = dateEnd.getText().toString();
                 final String startTime = timeStart.getText().toString();
-                final String endTime = OnboardingFragment2.timeEnd.getText().toString();
+                final String endTime = timeEnd.getText().toString();
                 final String notify = OnboardingFragment2.alarming.getText().toString();
-                final String invitedContacts = OnboardingFragment3.mtxtinvited.getText().toString();
+                final String invitedContacts = mtxtinvited.getText().toString();
+
+//                name = event.getText().toString();
+//                eventDescription = descrip.getText().toString();
+//                eventLocation = locate.getText().toString();
+//                startDate = dateStart.getText().toString();
+//                endDate = dateEnd.getText().toString();
+//                startTime = timeStart.getText().toString();
+//                endTime = OnboardingFragment2.timeEnd.getText().toString();
+//                notify = OnboardingFragment2.alarming.getText().toString();
+//                invitedContacts = OnboardingFragment3.mtxtinvited.getText().toString();
 
                 Log.d("StarTime", startDate + " " + startTime);
                 Log.d("EndTime", endDate + " " + endTime);
@@ -272,15 +311,15 @@ public class OnboardingActivity extends AppCompatActivity {
                     Toast.makeText(context, "Please add Starting date and completion date.", Toast.LENGTH_SHORT).show();
                 } else {
 
-
-                    LandingActivity.db.saveEvent(LandingActivity.imei, unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
-                    OkHttp.getInstance(getBaseContext()).saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
-
-                    for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
-                        String[] target = OnboardingFragment3.invitedContacts.get(i).split("@");
-                        OkHttp.getInstance(context).sendNotification("Invitation",unixtime, name, eventDescription, eventLocation,
-                                startDate, startTime, endDate, endTime, notify, invitedContacts,target[0]+"Velma");//target[0]
-                    }
+                    saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
+//                    LandingActivity.db.saveEvent(LandingActivity.imei, unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
+                    //OkHttp.getInstance(getBaseContext()).saveEvent(unixtime, name, eventDescription, eventLocation, startDate, startTime, endDate, endTime, notify, invitedContacts);
+//
+//                    for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
+//                        String[] target = OnboardingFragment3.invitedContacts.get(i).split("@");
+//                        OkHttp.getInstance(context).sendNotification("Invitation",unixtime, name, eventDescription, eventLocation,
+//                                startDate, startTime, endDate, endTime, notify, invitedContacts,target[0]+"Velma");//target[0]
+//                    }
 
                     Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
@@ -290,6 +329,121 @@ public class OnboardingActivity extends AppCompatActivity {
                 }
 
 
+            }
+        });
+
+
+    }
+
+    public void saveEvent(Long eventid, String eventname, String eventDescription, String eventLocation,
+                          String eventStartDate, String eventStartTime, String eventEndDate,
+                          String eventEndTime, String notify, String invitedfirends) {
+
+        final Long myeventid = eventid;
+//        final String name1 = event.getText().toString();
+//        final String eventDescription1 = descrip.getText().toString();
+//        final String eventLocation1 = locate.getText().toString();
+//        final String startDate1 = dateStart.getText().toString();
+//        final String endDate = dateEnd.getText().toString();
+//        final String startTime1 = timeStart.getText().toString();
+//        final String endTime1 = OnboardingFragment2.timeEnd.getText().toString();
+//        final String notify1 = OnboardingFragment2.alarming.getText().toString();
+//        final String invitedContacts1 = OnboardingFragment3.mtxtinvited.getText().toString();
+
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://velma.000webhostapp.com/add_velma_events.php").newBuilder();
+        urlBuilder.addQueryParameter("userid", "" + LandingActivity.imei);
+        urlBuilder.addQueryParameter("eventid", "" + eventid);
+        urlBuilder.addQueryParameter("eventname", eventname);
+        urlBuilder.addQueryParameter("eventDescription", eventDescription);
+        urlBuilder.addQueryParameter("eventLocation", eventLocation);
+        urlBuilder.addQueryParameter("eventStartDate", eventStartDate);
+        urlBuilder.addQueryParameter("eventStartTime", eventStartTime);
+        urlBuilder.addQueryParameter("eventEndDate", eventEndDate);
+        urlBuilder.addQueryParameter("eventEndTime", eventEndTime);
+        urlBuilder.addQueryParameter("notify", notify);
+        urlBuilder.addQueryParameter("invitedfirends", invitedfirends);
+
+        String Url = urlBuilder.build().toString();
+
+        Log.d("URL", Url);
+
+        Request request = new Request.Builder()
+                .url(Url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                // ... check for failure using `isSuccessful` before proceeding
+                // Read data on the worker thread
+                final String responseData = response.body().string();
+                Log.d("Data", responseData);
+                if (response.code() == 200) {
+                    // Run view-related code back on the main thread
+
+
+                    if (responseData.equalsIgnoreCase("Records added successfully")) {
+
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                Toast.makeText(context, "event successfully added.", Toast.LENGTH_SHORT).show();
+
+                                //        final String name1 = event.getText().toString();
+//        final String eventDescription1 = descrip.getText().toString();
+//        final String eventLocation1 = locate.getText().toString();
+//        final String startDate1 = dateStart.getText().toString();
+//        final String endDate = dateEnd.getText().toString();
+//        final String startTime1 = timeStart.getText().toString();
+//        final String endTime1 = OnboardingFragment2.timeEnd.getText().toString();
+//        final String notify1 = OnboardingFragment2.alarming.getText().toString();
+//        final String invitedContacts1 = OnboardingFragment3.mtxtinvited.getText().toString();
+
+                                LandingActivity.db.saveEvent(LandingActivity.imei, myeventid, event.getText().toString(), descrip.getText().toString()
+                                        , locate.getText().toString(), dateStart.getText().toString(), timeStart.getText().toString(), dateEnd.getText().toString(), OnboardingFragment2.timeEnd.getText().toString()
+                                        , OnboardingFragment2.alarming.getText().toString(), OnboardingFragment3.mtxtinvited.getText().toString());
+                                for (int i = 0; i <= OnboardingFragment3.invitedContacts.size() - 1; i++) {
+                                    String[] target = OnboardingFragment3.invitedContacts.get(i).split("@");
+//                            OkHttp.getInstance(context).sendNotification("Invitation", unixtime, name, eventDescription, eventLocation,
+//                                    startDate, startTime, endDate, endTime, notify, invitedContacts, target[0] + "Velma");//target[0]
+                                    OkHttp.getInstance(context).sendNotification("Invitation", myeventid, event.getText().toString(), descrip.getText().toString(), locate.getText().toString(),
+                                            dateStart.getText().toString(), timeStart.getText().toString(), dateEnd.getText().toString(), timeEnd.getText().toString(),
+                                            OnboardingFragment2.alarming.getText().toString(), mtxtinvited.getText().toString(),target[0]+"Velma");//target[0]
+
+                                }
+
+                            }
+                        });
+
+
+                    } else {
+
+
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, "Unable to save event, conflict of time.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
+
+
+                } else {
+
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "Unable to save event, conflict of time.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
             }
         });
 

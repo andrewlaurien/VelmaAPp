@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 //android {
 //    compileSdkVersion 25
 //    buildToolsVersion "25.0.0"
+//    useLibrary 'org.apache.http.legacy'
 //    defaultConfig {
 //        applicationId "com.thesis.velma"
 //        minSdkVersion 19
@@ -17,6 +18,9 @@ apply plugin: 'com.android.application'
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 //        }
 //    }
+//    dexOptions {
+//        javaMaxHeapSize "4g"
+//    }
 //}
 
 android {
@@ -29,7 +33,7 @@ android {
         multiDexEnabled true
         applicationId "com.thesis.velma"
         minSdkVersion 19
-        targetSdkVersion 21
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }

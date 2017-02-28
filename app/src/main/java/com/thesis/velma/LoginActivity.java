@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -293,6 +294,8 @@ public class LoginActivity extends AppCompatActivity implements OnConnectionFail
         switch (v.getId()) {
             case sign_in_button:
 
+
+                Toast.makeText(getBaseContext(), "hi", Toast.LENGTH_SHORT).show();
                 int status = NetworkUtil.getConnectivityStatusString(mcontext);
 
                 if (status == 0) {
